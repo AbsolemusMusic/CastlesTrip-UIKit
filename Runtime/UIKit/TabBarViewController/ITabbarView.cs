@@ -1,7 +1,10 @@
 using System;
 
-public interface ITabbarView
+namespace CastlesTrip.UIKit
 {
-    public int CountOfItems { get; }
-    event Action<int, bool> OnTabbarButtonTapped;
+    public interface ITabbarView
+    {
+        public int CountOfItems { get; }
+        event Action<int, bool> OnTabbarButtonTapped;
+    }
 }

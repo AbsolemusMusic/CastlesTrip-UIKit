@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CT.UIKit
+namespace CastlesTrip.UIKit
 {
     public class UITableViewCell : MonoBehaviour
     {

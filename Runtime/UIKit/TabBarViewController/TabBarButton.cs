@@ -2,44 +2,47 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-[Serializable]
-public class TabbarButton : MonoBehaviour, ITabbarButton
+namespace CastlesTrip.UIKit
 {
-    [SerializeField]
-    private Button mainButton;
-
-    [SerializeField]
-    private Image iconImg;
-
-    [SerializeField]
-    private Sprite activeSprite;
-
-    [SerializeField]
-    private Sprite inactiveSprite;
-
-    public event Action<TabbarButton> OnClicked;
-
-    private void Start()
+    [Serializable]
+    public class TabbarButton : MonoBehaviour, ITabbarButton
     {
-        mainButton.onClick.AddListener(OnMainTapped);
-    }
+        [SerializeField]
+        private Button mainButton;
 
-    private void OnDestroy()
-    {
-        mainButton.onClick.RemoveListener(OnMainTapped);
-    }
+        [SerializeField]
+        private Image iconImg;
 
-    public virtual void SetSelected(bool state)
-    {
-        try
+        [SerializeField]
+        private Sprite activeSprite;
+
+        [SerializeField]
+        private Sprite inactiveSprite;
+
+        public event Action<TabbarButton> OnClicked;
+
+        private void Start()
         {
-            iconImg.sprite = state ? activeSprite : inactiveSprite;
+            mainButton.onClick.AddListener(OnMainTapped);
         }
-        catch { }
-    }
 
-    private void OnMainTapped()
-    {
-        OnClicked?.Invoke(this);
+        private void OnDestroy()
+        {
+            mainButton.onClick.RemoveListener(OnMainTapped);
+        }
+
+        public virtual void SetSelected(bool state)
+        {
+            try
+            {
+                iconImg.sprite = state ? activeSprite : inactiveSprite;
+            }
+            catch { }
+        }
+
+        private void OnMainTapped()
+        {
+            OnClicked?.Invoke(this);
+        }
     }
 }

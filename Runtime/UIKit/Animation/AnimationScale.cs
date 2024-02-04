@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CT.Animation
+namespace CastlesTrip.UIKit
 {
     public class AnimationScale
     {

@@ -1,7 +1,10 @@
 using System;
 
-public interface ITabbarButton
+namespace CastlesTrip.UIKit
 {
-    public void SetSelected(bool state);
-    public event Action<TabbarButton> OnClicked;
+    public interface ITabbarButton
+    {
+        public void SetSelected(bool state);
+        public event Action<TabbarButton> OnClicked;
+    }
 }

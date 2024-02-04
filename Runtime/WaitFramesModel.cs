@@ -1,39 +1,42 @@
 using System;
 using System.Collections;
 
-public class WaitFramesModel
+namespace CastlesTrip.UIKit
 {
-    private int frameCount;
-    private IEnumerator waiter;
-
-    public WaitFramesModel(int frameCount)
+    public class WaitFramesModel
     {
-        frameCount = Math.Clamp(frameCount, 1, 24);
-        this.frameCount = frameCount;
-    }
+        private int frameCount;
+        private IEnumerator waiter;
 
-    public void Start(Action completion)
-    {
-        Stop();
-        waiter = Waiter(completion);
-        Coroutines.StartRoutine(waiter);
-    }
+        public WaitFramesModel(int frameCount)
+        {
+            frameCount = Math.Clamp(frameCount, 1, 24);
+            this.frameCount = frameCount;
+        }
 
-    public void Stop()
-    {
-        if (waiter == null)
-            return;
+        public void Start(Action completion)
+        {
+            Stop();
+            waiter = Waiter(completion);
+            Coroutines.StartRoutine(waiter);
+        }
 
-        Coroutines.StopRoutine(waiter);
-        waiter = null;
-    }
+        public void Stop()
+        {
+            if (waiter == null)
+                return;
 
-    private IEnumerator Waiter(Action completion)
-    {
-        for (int i = 0; i < frameCount; i++)
-            yield return null;
+            Coroutines.StopRoutine(waiter);
+            waiter = null;
+        }
 
-        completion?.Invoke();
-        Stop();
+        private IEnumerator Waiter(Action completion)
+        {
+            for (int i = 0; i < frameCount; i++)
+                yield return null;
+
+            completion?.Invoke();
+            Stop();
+        }
     }
 }

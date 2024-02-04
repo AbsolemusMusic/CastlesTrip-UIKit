@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace CT.Animation
+namespace CastlesTrip.UIKit
 {
     public class Animation
     {

@@ -1,9 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Extension.UI;
-using CT.Animation;
 
-namespace CT.UIKit
+namespace CastlesTrip.UIKit
 {
     public enum ViewControllerPresentType
     {
@@ -109,7 +108,7 @@ namespace CT.UIKit
 
         public virtual void UpdateContent()
         {
-            
+
         }
 
         private void UpdatePosition()
@@ -259,7 +258,7 @@ namespace CT.UIKit
         public void PresentAnimation(bool isPresent, CompletionEH completion)
         {
             ProgressChangedEH handler = GetHandler(isPresent);
-            Animation.Animation anim = new Animation.Animation();
+            Animation anim = new Animation();
             anim.AnimTime = CloseWaitTime;
             anim.AnimType = AnimationType.Pow2AnimationType;
             anim.StartAnim(handler, completion);

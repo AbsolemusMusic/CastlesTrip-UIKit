@@ -1,36 +1,39 @@
 using System.Collections;
 using UnityEngine;
 
-public sealed class Coroutines : MonoBehaviour
+namespace CastlesTrip.UIKit
 {
-    private static Coroutines _instance;
-    private static Coroutines instance
+    public sealed class Coroutines : MonoBehaviour
     {
-        get
+        private static Coroutines _instance;
+        private static Coroutines instance
         {
-            if (_instance == null)
+            get
             {
-                var go = new GameObject("[COROUTINE MANAGER]");
-                _instance = go.AddComponent<Coroutines>();
-                DontDestroyOnLoad(go);
+                if (_instance == null)
+                {
+                    var go = new GameObject("[COROUTINE MANAGER]");
+                    _instance = go.AddComponent<Coroutines>();
+                    DontDestroyOnLoad(go);
+                }
+
+                return _instance;
             }
-
-            return _instance;
         }
-    }
 
-    public static Coroutine StartRoutine(IEnumerator enumerator)
-    {
-        return instance.StartCoroutine(enumerator);
-    }
+        public static Coroutine StartRoutine(IEnumerator enumerator)
+        {
+            return instance.StartCoroutine(enumerator);
+        }
 
-    public static void StopRoutine(Coroutine routine)
-    {
-        instance.StopCoroutine(routine);
-    }
+        public static void StopRoutine(Coroutine routine)
+        {
+            instance.StopCoroutine(routine);
+        }
 
-    public static void StopRoutine(IEnumerator routine)
-    {
-        instance.StopCoroutine(routine);
+        public static void StopRoutine(IEnumerator routine)
+        {
+            instance.StopCoroutine(routine);
+        }
     }
 }

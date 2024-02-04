@@ -1,127 +1,129 @@
 using System.Collections.Generic;
-using CT.UIKit;
 using UnityEngine;
 
-public abstract class TabbarViewController : UIViewController, ITabbarViewController
+namespace CastlesTrip.UIKit
 {
-    public virtual TabbarView tabbarView { get; }
-
-    public abstract bool IsHorizontal { get; }
-
-    [SerializeField]
-    private RectTransform parentVCRectTr;
-    private bool isInited;
-    private int currentID = -1;
-    public int CurrentID => currentID;
-
-    private List<UIViewController> viewControllers = new List<UIViewController>();
-
-    private ViewControllerPresentType[] horizontal = new ViewControllerPresentType[] { ViewControllerPresentType.fromRight, ViewControllerPresentType.fromLeft };
-    private ViewControllerPresentType[] vertical = new ViewControllerPresentType[] { ViewControllerPresentType.fromDown, ViewControllerPresentType.fromUp };
-    private ViewControllerPresentType[] targetPresentTypes => IsHorizontal ? horizontal : vertical;
-
-    public override void Present(bool isShow = true)
+    public abstract class TabbarViewController : UIViewController, ITabbarViewController
     {
-        tabbarView.OnTabbarButtonTapped += TabbarView_OnTabbarButtonTapped;
-        base.Present(isShow);
-    }
+        public virtual TabbarView tabbarView { get; }
 
-    public override void OnDestroy()
-    {
-        tabbarView.OnTabbarButtonTapped -= TabbarView_OnTabbarButtonTapped;
-        base.OnDestroy();
-    }
+        public abstract bool IsHorizontal { get; }
 
-    public override void Start()
-    {
-        base.Start();
+        [SerializeField]
+        private RectTransform parentVCRectTr;
+        private bool isInited;
+        private int currentID = -1;
+        public int CurrentID => currentID;
 
-        for (int i = 0; i < tabbarView.CountOfItems; i++)
+        private List<UIViewController> viewControllers = new List<UIViewController>();
+
+        private ViewControllerPresentType[] horizontal = new ViewControllerPresentType[] { ViewControllerPresentType.fromRight, ViewControllerPresentType.fromLeft };
+        private ViewControllerPresentType[] vertical = new ViewControllerPresentType[] { ViewControllerPresentType.fromDown, ViewControllerPresentType.fromUp };
+        private ViewControllerPresentType[] targetPresentTypes => IsHorizontal ? horizontal : vertical;
+
+        public override void Present(bool isShow = true)
         {
-            UIViewController loadVC = GetViewControllerForTabbar(i);
-            loadVC.PresentType = GetPresentType(i != 0);
-            PresentVC(loadVC, i);
-            viewControllers.Add(loadVC);
-            if (i == tabbarView.SelectedID)
+            tabbarView.OnTabbarButtonTapped += TabbarView_OnTabbarButtonTapped;
+            base.Present(isShow);
+        }
+
+        public override void OnDestroy()
+        {
+            tabbarView.OnTabbarButtonTapped -= TabbarView_OnTabbarButtonTapped;
+            base.OnDestroy();
+        }
+
+        public override void Start()
+        {
+            base.Start();
+
+            for (int i = 0; i < tabbarView.CountOfItems; i++)
             {
-                loadVC.Present(this);
-                continue;
+                UIViewController loadVC = GetViewControllerForTabbar(i);
+                loadVC.PresentType = GetPresentType(i != 0);
+                PresentVC(loadVC, i);
+                viewControllers.Add(loadVC);
+                if (i == tabbarView.SelectedID)
+                {
+                    loadVC.Present(this);
+                    continue;
+                }
+                loadVC.Present(false);
             }
-            loadVC.Present(false);
+
+            tabbarView.Select(tabbarView.SelectedID);
         }
 
-        tabbarView.Select(tabbarView.SelectedID);
-    }
-
-    private void PresentVC(UIViewController vc, int index)
-    {
-        RectTransform rectTR = vc.GetComponent<RectTransform>();
-        rectTR.SetParent(parentVCRectTr);
-        rectTR.Reset();
-    }
-
-    private void TabbarView_OnTabbarButtonTapped(int targetID, bool state)
-    {
-        if (currentID == targetID)
-            return;
-
-        if (!CanSelect(targetID))
-            return;
-
-        bool isRightTarget = currentID < targetID;
-        UIViewController targetVC = viewControllers[targetID];
-        targetVC.PresentType = GetPresentType(isRightTarget);
-
-        if (!isInited)
+        private void PresentVC(UIViewController vc, int index)
         {
-            currentID = targetID;
-            targetVC.PresentType = ViewControllerPresentType.none;
-            isInited = true;
+            RectTransform rectTR = vc.GetComponent<RectTransform>();
+            rectTR.SetParent(parentVCRectTr);
+            rectTR.Reset();
+        }
+
+        private void TabbarView_OnTabbarButtonTapped(int targetID, bool state)
+        {
+            if (currentID == targetID)
+                return;
+
+            if (!CanSelect(targetID))
+                return;
+
+            bool isRightTarget = currentID < targetID;
+            UIViewController targetVC = viewControllers[targetID];
+            targetVC.PresentType = GetPresentType(isRightTarget);
+
+            if (!isInited)
+            {
+                currentID = targetID;
+                targetVC.PresentType = ViewControllerPresentType.none;
+                isInited = true;
+                targetVC.Show(true);
+                OnSelected(currentID);
+                return;
+            }
+
+            UIViewController last = viewControllers[currentID];
+            last.PresentType = GetPresentType(!isRightTarget);
+            last.Show(false);
             targetVC.Show(true);
+            currentID = targetID;
             OnSelected(currentID);
-            return;
         }
 
-        UIViewController last = viewControllers[currentID];
-        last.PresentType = GetPresentType(!isRightTarget);
-        last.Show(false);
-        targetVC.Show(true);
-        currentID = targetID;
-        OnSelected(currentID);
-    }
-
-    private ViewControllerPresentType GetPresentType(bool isNext)
-    {
-        int id = isNext ? 0 : 1;
-        return targetPresentTypes[id];
-    }
-
-    public UIViewController GetTabbarViewController()
-    {
-        if (currentID < 0)
-            return null;
-
-        return GetTabbarViewController(currentID);
-    }
-
-    public UIViewController GetTabbarViewController(int itemID)
-    {
-        try
+        private ViewControllerPresentType GetPresentType(bool isNext)
         {
-            return viewControllers[itemID];
+            int id = isNext ? 0 : 1;
+            return targetPresentTypes[id];
         }
-        catch { }
 
-        return null;
+        public UIViewController GetTabbarViewController()
+        {
+            if (currentID < 0)
+                return null;
+
+            return GetTabbarViewController(currentID);
+        }
+
+        public UIViewController GetTabbarViewController(int itemID)
+        {
+            try
+            {
+                return viewControllers[itemID];
+            }
+            catch { }
+
+            return null;
+        }
+        public abstract bool CanSelect(int itemID);
+        public abstract UIViewController GetViewControllerForTabbar(int itemID);
+        public virtual void OnSelected(int itemID) { }
     }
-    public abstract bool CanSelect(int itemID);
-    public abstract UIViewController GetViewControllerForTabbar(int itemID);
-    public virtual void OnSelected(int itemID) { }
-}
 
-public interface ITabbarViewController
-{
-    abstract UIViewController GetViewControllerForTabbar(int itemID);
-    abstract bool CanSelect(int itemID);
-    abstract void OnSelected(int itemID);
+    public interface ITabbarViewController
+    {
+        abstract UIViewController GetViewControllerForTabbar(int itemID);
+        abstract bool CanSelect(int itemID);
+        abstract void OnSelected(int itemID);
+    }
 }

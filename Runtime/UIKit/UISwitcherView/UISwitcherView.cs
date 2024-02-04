@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CT.UIKit
+namespace CastlesTrip.UIKit
 {
     public abstract class UISwitcherView : MonoBehaviour, IUISwitcherView
     {
@@ -20,8 +20,8 @@ namespace CT.UIKit
 
         public virtual void Awake()
         {
-            _leftButton.onClick.AddListener(delegate() { SetSelected(true, true); });
-            _rightButton.onClick.AddListener(delegate() { SetSelected(false, true); });
+            _leftButton.onClick.AddListener(delegate () { SetSelected(true, true); });
+            _rightButton.onClick.AddListener(delegate () { SetSelected(false, true); });
 
             SetSelected(IsLeftStartState, false);
         }
