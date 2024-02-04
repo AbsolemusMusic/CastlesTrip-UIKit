@@ -4,7 +4,7 @@
     "description": "Castles Trip - Unity UI Kit",
     "version": "0.1.0",
     "type": "tool",
-    "unity": "2022.3.18f1",
+    "unity": "2020.3",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -14,8 +14,6 @@
     "keywords": [
         "ui",
         "adaptive-screen",
-        "UIKit",
-        "TableView",
-        "Cells"
+        "UIKit"
     ]
 }
