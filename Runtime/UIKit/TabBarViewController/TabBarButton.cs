@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     [Serializable]
     public class TabbarButton : MonoBehaviour, ITabbarButton

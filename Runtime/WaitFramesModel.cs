@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     public class WaitFramesModel
     {

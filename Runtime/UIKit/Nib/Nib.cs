@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     public class Nib : MonoBehaviour
     {

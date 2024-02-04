@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Extension.UI;
 
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     public enum ViewControllerPresentType
     {

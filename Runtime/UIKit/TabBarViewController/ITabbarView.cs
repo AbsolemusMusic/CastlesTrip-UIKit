@@ -1,6 +1,6 @@
 using System;
 
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     public interface ITabbarView
     {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     // TODO: At Work
     public class UITableViewController : UIViewController, ITableViewDelegate, ITableViewDataSource

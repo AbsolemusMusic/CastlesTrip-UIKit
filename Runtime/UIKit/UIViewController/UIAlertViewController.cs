@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     public class UIAlertViewController : UIViewController, IAlertButtonView
     {

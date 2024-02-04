@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     public abstract class UISwitcherView : MonoBehaviour, IUISwitcherView
     {

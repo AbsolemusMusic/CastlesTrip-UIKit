@@ -1,4 +1,4 @@
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     public enum AnimationType
     {

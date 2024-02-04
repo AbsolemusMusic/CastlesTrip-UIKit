@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     public abstract class TabbarViewController : UIViewController, ITabbarViewController
     {

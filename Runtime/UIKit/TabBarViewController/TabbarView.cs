@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     public class TabbarView : MonoBehaviour, ITabbarView
     {

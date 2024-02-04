@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace CastlesTrip.UIKit
+namespace CT.UIKit
 {
     public sealed class Coroutines : MonoBehaviour
     {
