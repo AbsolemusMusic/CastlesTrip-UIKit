@@ -1,0 +1,19 @@
+{
+    "name": "com.castles.trip.layoutmorph",
+    "version": "0.9.0",
+    "description": "Custom UI Layout Extension - Adaptive Screen Layout",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:AbsolemusMusic/Toolkit-LayoutMorph.git"
+    },
+    "author": "Castles Trip <castles.trip@gmail.com> (https://github.com/AbsolemusMusic)",
+    "keywords": [
+        "ui",
+        "layout",
+        "adaptive-screen"
+    ],
+    "displayName": "Layout Morph UI",
+    "unity": "2020.1",
+    "type": "tool"
+}
