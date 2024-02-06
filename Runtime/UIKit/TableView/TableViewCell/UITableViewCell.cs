@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace CT.UIKit
 {
-    public class UITableViewCell : MonoBehaviour
+    public class UITableViewCell : MonoBehaviour, IUITableViewCell
     {
         private IndexPath indexPath;
         public IndexPath IndexPath => indexPath;
@@ -11,7 +11,18 @@ namespace CT.UIKit
         [SerializeField]
         private Button cellButton;
 
-        public IUITableViewCell tvcDelegate;
+        public IUITableViewCellDelegate TVCDelegate { get; set; }
+
+        private RectTransform rect;
+        public RectTransform Rect
+        {
+            get
+            {
+                if (!rect && TryGetComponent(out RectTransform _rect))
+                    rect = _rect;
+                return rect;
+            }
+        }
 
         public virtual void Init(IndexPath indexPath)
         {
@@ -27,12 +38,7 @@ namespace CT.UIKit
 
         public virtual void OnCellTapped()
         {
-            tvcDelegate?.OnCellTapped(this, indexPath);
+            TVCDelegate?.OnCellTapped(this, indexPath);
         }
-    }
-
-    public interface IUITableViewCell
-    {
-        public void OnCellTapped(UITableViewCell cell, IndexPath indexPath);
     }
 }

@@ -41,7 +41,7 @@ namespace CT.UIKit
 
             if (nib.TryGetComponent(out UITableViewCell cell))
             {
-                cell.tvcDelegate = tableView;
+                cell.TVCDelegate = tableView;
                 cell.Init(indexPath);
             }
 

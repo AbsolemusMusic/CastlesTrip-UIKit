@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace CT.UIKit
 {
-    public class UITableView : MonoBehaviour, ITableView, ITableViewDelegate, IUITableViewCell
+    public class UITableView : MonoBehaviour, ITableView, ITableViewDelegate, IUITableViewCellDelegate
     {
         [SerializeField]
         private LayoutGroup layoutGroup;
@@ -12,8 +12,6 @@ namespace CT.UIKit
 
         public ITableViewDataSource m_dataSource;
         public ITableViewDelegate m_delegate;
-
-        private GameObject cellPref;
 
         private UITableViewCell lastSelected;
         public UITableViewCell CellSelected => lastSelected ? lastSelected : null;
@@ -56,14 +54,6 @@ namespace CT.UIKit
                 {
                     cellRT.sizeDelta = m_dataSource.GetSize(this, cell);
                 }
-            }
-        }
-
-        public void RegisterCell(GameObject cellPref)
-        {
-            if (cellPref && TryGetComponent(out UITableViewCell _))
-            {
-                this.cellPref = cellPref;
             }
         }
 
@@ -184,41 +174,6 @@ namespace CT.UIKit
         public virtual void ForceRebuildLayout(RectTransform parentRT)
         {
             LayoutRebuilder.ForceRebuildLayoutImmediate(parentRT);
-        }
-    }
-
-    public interface ITableView
-    {
-        public void RegisterCell(GameObject cellPref);
-        public void Reload();
-        public void RemoveItems();
-        public void Fetch();
-        public void ForceRebuildLayout();
-        public void ForceRebuildLayout(RectTransform parentRT);
-    }
-
-    public interface ITableViewDataSource
-    {
-        public int GetNumberOfRows(UITableView tableView);
-        public int GetCellSelectedID(UITableView tableView);
-        public Vector2 GetSize(UITableView tableView, UITableViewCell cell = null);
-        public Vector2 GetSpace(UITableView tableView);
-        public RectOffset GetPadding(UITableView tableView);
-        public UITableViewCell TableViewCell(UITableView tableView, IndexPath indexPath);
-    }
-
-    public interface ITableViewDelegate
-    {
-        public bool CanChoose(UITableView tableView, IndexPath indexPath);
-        public void DidSelected(UITableView tableView, UITableViewCell cell, IndexPath indexPath);
-    }
-
-    public struct IndexPath
-    {
-        public int row;
-        public IndexPath(int cellID)
-        {
-            row = cellID;
         }
     }
 }
