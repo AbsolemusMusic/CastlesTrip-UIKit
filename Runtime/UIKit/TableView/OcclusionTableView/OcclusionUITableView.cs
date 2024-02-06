@@ -18,6 +18,12 @@ namespace CT.UIKit
 
         private float WAIT = 0.1f;
 
+        public override void Reload()
+        {
+            SetEnabledState(true);
+            base.Reload();
+        }
+
         public override void ForceRebuildLayout(RectTransform parentRT)
         {
             base.ForceRebuildLayout(parentRT);
