@@ -2,7 +2,7 @@
     "name": "com.castles.trip.uikit",
     "displayName": "Unity UI Kit",
     "description": "Castles Trip - Unity UI Kit",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "type": "tool",
     "unity": "2020.3",
     "license": "MIT",
