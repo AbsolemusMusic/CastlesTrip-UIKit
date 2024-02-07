@@ -19,10 +19,13 @@ namespace CT.UIKit
 
         public virtual float WAIT { get; } = 0.1f;
 
+        private bool[] cellStates;
+
         public override void Reload()
         {
             SetEnabledState(true);
             base.Reload();
+            cellStates = new bool[m_dataSource.GetNumberOfRows(this)];
         }
 
         public override void ForceRebuildLayout(RectTransform parentRT)
@@ -68,11 +71,11 @@ namespace CT.UIKit
             if (!isInit)
                 return;
 
-            foreach (IUITableViewCell cell in Cells)
+            foreach (UITableViewCell cell in Cells)
                 UpdateCellState(cell);
         }
 
-        private void UpdateCellState(IUITableViewCell cell)
+        private void UpdateCellState(UITableViewCell cell)
         {
             RectTransform rect = cell.Rect;
 
@@ -91,7 +94,7 @@ namespace CT.UIKit
             if (_isVertical && _isHorizontal)
             {
                 isInactive = isLessOrGreatVertical || isLessOrGreatHorizontal;
-                SetActiveState(rect, !isInactive);
+                SetActiveState(cell, !isInactive);
                 return;
             }
 
@@ -101,12 +104,24 @@ namespace CT.UIKit
             if (_isHorizontal)
                 isInactive = isLessOrGreatHorizontal;
 
-            SetActiveState(rect, !isInactive);
+            SetActiveState(cell, !isInactive);
         }
 
-        private void SetActiveState(RectTransform cellRT, bool isActive)
+        private void SetActiveState(UITableViewCell cell, bool isActive)
         {
-            cellRT.gameObject.SetActive(isActive);
+            GameObject cellGO = cell.Rect.gameObject;
+            IndexPath indexPath = cell.IndexPath;
+            bool isDisplay = isActive && !cellStates[indexPath.row];
+            cellStates[indexPath.row] = isActive;
+            cellGO.SetActive(isActive);
+            if (!isDisplay)
+                return;
+            OnWillDisplay(this, cell, indexPath);
+        }
+
+        public virtual void OnWillDisplay(UITableView tableView, UITableViewCell cell, IndexPath indexPath)
+        {
+
         }
     }
 }
