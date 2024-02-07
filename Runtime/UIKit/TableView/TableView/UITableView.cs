@@ -7,8 +7,14 @@ namespace CT.UIKit
     public class UITableView : MonoBehaviour, ITableView, ITableViewDelegate, IUITableViewCellDelegate
     {
         [SerializeField]
+        private ScrollRect _scrollRect;
+        public ScrollRect ScrollRect => _scrollRect;
+
+        [SerializeField]
         private LayoutGroup layoutGroup;
         public LayoutGroup LayoutGroup => layoutGroup;
+
+        private OcclussionModel occlussionModel;
 
         public ITableViewDataSource m_dataSource;
         public ITableViewDelegate m_delegate;
@@ -57,6 +63,19 @@ namespace CT.UIKit
             }
         }
 
+        public virtual void Reload()
+        {
+            occlussionModel = null;
+            if (m_dataSource.GetOcclussionState(this))
+                occlussionModel = new OcclussionModel(this);
+
+            RemoveItems();
+            Fetch();
+            ForceRebuildLayout();
+
+            occlussionModel?.UpdateModel();
+        }
+
         public virtual void Fetch()
         {
             if (m_delegate == null || m_dataSource == null) return;
@@ -100,13 +119,6 @@ namespace CT.UIKit
             UpdateCellsSize();
         }
 
-        public virtual void Reload()
-        {
-            RemoveItems();
-            Fetch();
-            ForceRebuildLayout();
-        }
-
         public virtual void RemoveItems()
         {
             layoutGroup?.gameObject.SetActive(false);
@@ -114,16 +126,14 @@ namespace CT.UIKit
                 Destroy(cell.gameObject);
 
             foreach (Transform child in layoutGroup.transform)
-            {
                 Destroy(child.gameObject);
-            }
 
             cells.Clear();
         }
 
         public virtual void OnCellTapped(UITableViewCell cell, IndexPath indexPath)
         {
-            if (!m_delegate.CanChoose(this, indexPath)) return;
+            if (!m_dataSource.CanChoose(this, indexPath)) return;
             DidSelected(this, cell, indexPath);
         }
 
@@ -165,6 +175,11 @@ namespace CT.UIKit
             DidSelectedWithoutNotify(this, cell, cell.IndexPath);
         }
 
+        public void OnWillDisplay(UITableView tableView, UITableViewCell cell, IndexPath indexPath)
+        {
+            m_delegate?.OnWillDisplay(tableView, cell, indexPath);
+        }
+
         public virtual void ForceRebuildLayout()
         {
             if (layoutGroup.transform.parent.TryGetComponent(out RectTransform rectTr))
@@ -174,6 +189,18 @@ namespace CT.UIKit
         public virtual void ForceRebuildLayout(RectTransform parentRT)
         {
             LayoutRebuilder.ForceRebuildLayoutImmediate(parentRT);
+            occlussionModel?.ForceRebuildLayout();
+
+            if (occlussionModel == null)
+                return;
+            // TODO: Временное решение
+            Invoke(nameof(TryInitOcculussion), occlussionModel.WAIT);
+        }
+
+        // TODO: Временное решение
+        private void TryInitOcculussion()
+        {
+            occlussionModel?.Init();
         }
     }
 }
