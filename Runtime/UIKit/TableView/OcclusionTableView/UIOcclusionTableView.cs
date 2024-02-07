@@ -3,10 +3,11 @@ using UnityEngine.UI;
 
 namespace CT.UIKit
 {
-    public class OcclusionUITableView : UITableView
+    public class UIOcclusionTableView : UITableView
     {
         [SerializeField]
-        private ScrollRect scrollRect;
+        private ScrollRect _scrollRect;
+        public ScrollRect ScrollRect => _scrollRect;
 
         private Transform srTransform;
         private bool isInit;
@@ -16,7 +17,7 @@ namespace CT.UIKit
         private Vector2 offset = new Vector2(20, 20);
         public virtual Vector2 Offset => offset;
 
-        private float WAIT = 0.1f;
+        public virtual float WAIT { get; } = 0.1f;
 
         public override void Reload()
         {
@@ -28,10 +29,10 @@ namespace CT.UIKit
         {
             base.ForceRebuildLayout(parentRT);
 
-            _isVertical = scrollRect.vertical;
-            _isHorizontal = scrollRect.horizontal;
+            _isVertical = _scrollRect.vertical;
+            _isHorizontal = _scrollRect.horizontal;
 
-            scrollRect.onValueChanged.AddListener(UpdateCellsState);
+            _scrollRect.onValueChanged.AddListener(UpdateCellsState);
 
             // TODO: Костыль, что с этим делать непонятно
             Invoke("Init", WAIT);
@@ -39,9 +40,9 @@ namespace CT.UIKit
 
         private void Init()
         {
-            srTransform = scrollRect.transform;
+            srTransform = _scrollRect.transform;
 
-            if (scrollRect.TryGetComponent(out RectTransform rectTransform))
+            if (_scrollRect.TryGetComponent(out RectTransform rectTransform))
             {
                 Rect rect = rectTransform.rect;
                 Vector2 sizeDelta = Cells[0].Rect.sizeDelta;
@@ -52,7 +53,7 @@ namespace CT.UIKit
             SetEnabledState(false);
 
             isInit = true;
-            UpdateCellsState(scrollRect.normalizedPosition);
+            UpdateCellsState(_scrollRect.normalizedPosition);
         }
 
         private void SetEnabledState(bool isEnabled)
