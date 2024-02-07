@@ -14,7 +14,7 @@ namespace CT.UIKit
         private LayoutGroup layoutGroup;
         public LayoutGroup LayoutGroup => layoutGroup;
 
-        private OcclussionModel occlussionModel;
+        private OcclussionModel occlussionModel = new OcclussionModel();
 
         public ITableViewDataSource m_dataSource;
         public ITableViewDelegate m_delegate;
@@ -65,9 +65,12 @@ namespace CT.UIKit
 
         public virtual void Reload()
         {
-            occlussionModel = null;
+            occlussionModel?.Unsubscribe();
             if (m_dataSource.GetOcclussionState(this))
-                occlussionModel = new OcclussionModel(this);
+            {
+                
+                occlussionModel?.Subscribe(this);
+            }
 
             RemoveItems();
             Fetch();

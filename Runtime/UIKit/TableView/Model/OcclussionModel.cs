@@ -20,7 +20,7 @@ namespace CT.UIKit
 
         private bool[] cellStates;
 
-        public OcclussionModel(UITableView _tableView)
+        public void Subscribe(UITableView _tableView)
         {
             tableView = _tableView;
             _scrollRect = _tableView.ScrollRect;
@@ -30,7 +30,7 @@ namespace CT.UIKit
             cellStates = new bool[dataSource.GetNumberOfRows(tableView)];
         }
 
-        ~OcclussionModel()
+        public void Unsubscribe()
         {
             if (_scrollRect != null)
                 _scrollRect.onValueChanged.RemoveListener(UpdateCellsState);
