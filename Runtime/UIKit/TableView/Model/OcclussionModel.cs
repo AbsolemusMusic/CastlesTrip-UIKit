@@ -20,6 +20,12 @@ namespace CT.UIKit
 
         private bool[] cellStates;
 
+        public OcclussionModel(UITableView _tableView)
+        {
+            tableView = _tableView;
+            _scrollRect = _tableView.ScrollRect;
+        }
+
         public void Subscribe(UITableView _tableView)
         {
             tableView = _tableView;
