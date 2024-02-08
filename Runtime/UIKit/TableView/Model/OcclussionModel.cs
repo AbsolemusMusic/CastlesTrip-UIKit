@@ -28,6 +28,7 @@ namespace CT.UIKit
 
         public void Subscribe(UITableView _tableView)
         {
+            isInit = false;
             tableView = _tableView;
             _scrollRect = _tableView.ScrollRect;
             _scrollRect.onValueChanged.AddListener(UpdateCellsState);
