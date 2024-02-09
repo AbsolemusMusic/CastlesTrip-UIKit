@@ -82,6 +82,19 @@ namespace CT.UIKit
 
         public virtual IEnumerator ReloadAsync()
         {
+            yield return UpdateOcclussionModelAsync();
+            yield return RemoveItemsAsync();
+            yield return FetchAsync();
+            yield return ForceRebuildLayoutAsync();
+
+            LayoutRebuilder.MarkLayoutForRebuild(LayoutGroup.GetComponent<RectTransform>());
+            yield return new WaitForEndOfFrame();
+            yield return ActiveOcclussionModelAsync();
+            OnReloadSuccess?.Invoke(this);
+        }
+
+        public virtual IEnumerator UpdateOcclussionModelAsync()
+        {
             bool isOcclussion = m_dataSource.GetOcclussionState(this);
             if (isOcclussion)
             {
@@ -92,20 +105,37 @@ namespace CT.UIKit
                 occlussionModel?.Subscribe();
                 occlussionModel?.SetEnabledLayoutGroupState(true);
             }
+            yield return null;
+        }
 
-            RemoveItems();
-            Fetch();
-            ForceRebuildLayout();
-
-            LayoutRebuilder.MarkLayoutForRebuild(LayoutGroup.GetComponent<RectTransform>());
-            yield return new WaitForEndOfFrame();
+        public virtual IEnumerator ActiveOcclussionModelAsync()
+        {
+            bool isOcclussion = m_dataSource.GetOcclussionState(this);
             if (isOcclussion)
             {
                 occlussionModel?.UpdateValues();
                 occlussionModel?.SetEnabledLayoutGroupState(false);
                 occlussionModel?.Check();
             }
-            OnReloadSuccess?.Invoke(this);
+            yield return null;
+        }
+
+        public virtual IEnumerator RemoveItemsAsync()
+        {
+            RemoveItems();
+            yield return null;
+        }
+
+        public virtual IEnumerator FetchAsync()
+        {
+            Fetch();
+            yield return null;
+        }
+
+        public virtual IEnumerator ForceRebuildLayoutAsync()
+        {
+            ForceRebuildLayout();
+            yield return null;
         }
 
         public virtual void Fetch()
