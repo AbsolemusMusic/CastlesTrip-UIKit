@@ -16,6 +16,8 @@ namespace CT.UIKit
         private LayoutGroup layoutGroup;
         public LayoutGroup LayoutGroup => layoutGroup;
 
+        private OcclussionModel occlussionModel;
+
         public ITableViewDataSource m_dataSource;
         public ITableViewDelegate m_delegate;
 
@@ -23,12 +25,6 @@ namespace CT.UIKit
         public UITableViewCell CellSelected => lastSelected ? lastSelected : null;
         private List<UITableViewCell> cells = new List<UITableViewCell>();
         public List<UITableViewCell> Cells => cells;
-
-        public Action<UITableView> OnReloadSuccess;
-
-        private IOcclussionModel occlussionModel = new OcclussionModel();
-
-        private IEnumerator reloader;
 
 
         public int CellSelectedID
@@ -40,6 +36,7 @@ namespace CT.UIKit
                 return m_dataSource.GetCellSelectedID(this);
             }
         }
+
 
         public UITableViewCell GetCell(IndexPath indexPath)
         {
@@ -70,72 +67,19 @@ namespace CT.UIKit
 
         public virtual void Reload()
         {
-            if (reloader != null)
+            occlussionModel?.Unsubscribe();
+            if (m_dataSource.GetOcclussionState(this))
             {
-                Coroutines.StopRoutine(reloader);
-                reloader = null;
+                if (occlussionModel == null)
+                    occlussionModel = new OcclussionModel(this);
+                occlussionModel?.Subscribe(this);
             }
 
-            reloader = ReloadAsync();
-            Coroutines.StartRoutine(reloader);
-        }
-
-        public virtual IEnumerator ReloadAsync()
-        {
-            yield return UpdateOcclussionModelAsync();
-            yield return RemoveItemsAsync();
-            yield return FetchAsync();
-            yield return ForceRebuildLayoutAsync();
-
-            LayoutRebuilder.MarkLayoutForRebuild(LayoutGroup.GetComponent<RectTransform>());
-            yield return new WaitForEndOfFrame();
-            yield return ActiveOcclussionModelAsync();
-            OnReloadSuccess?.Invoke(this);
-        }
-
-        public virtual IEnumerator UpdateOcclussionModelAsync()
-        {
-            bool isOcclussion = m_dataSource.GetOcclussionState(this);
-            if (isOcclussion)
-            {
-                if (occlussionModel.IsSubscribed)
-                    occlussionModel.Unsubscribe();
-
-                occlussionModel?.Init(this);
-                occlussionModel?.Subscribe();
-                occlussionModel?.SetEnabledLayoutGroupState(true);
-            }
-            yield return null;
-        }
-
-        public virtual IEnumerator ActiveOcclussionModelAsync()
-        {
-            bool isOcclussion = m_dataSource.GetOcclussionState(this);
-            if (isOcclussion)
-            {
-                occlussionModel?.UpdateValues();
-                occlussionModel?.SetEnabledLayoutGroupState(false);
-                occlussionModel?.Check();
-            }
-            yield return null;
-        }
-
-        public virtual IEnumerator RemoveItemsAsync()
-        {
             RemoveItems();
-            yield return null;
-        }
-
-        public virtual IEnumerator FetchAsync()
-        {
             Fetch();
-            yield return null;
-        }
-
-        public virtual IEnumerator ForceRebuildLayoutAsync()
-        {
             ForceRebuildLayout();
-            yield return null;
+
+            occlussionModel?.UpdateModel();
         }
 
         public virtual void Fetch()
@@ -251,6 +195,18 @@ namespace CT.UIKit
         public virtual void ForceRebuildLayout(RectTransform parentRT)
         {
             LayoutRebuilder.ForceRebuildLayoutImmediate(parentRT);
+            occlussionModel?.ForceRebuildLayout();
+
+            if (occlussionModel == null)
+                return;
+            // TODO: ????????? ???????
+            Invoke(nameof(TryInitOcculussion), occlussionModel.WAIT);
+        }
+
+        // TODO: ????????? ???????
+        private void TryInitOcculussion()
+        {
+            occlussionModel?.Init();
         }
     }
 }
