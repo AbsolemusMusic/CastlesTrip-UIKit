@@ -3,12 +3,12 @@ using UnityEngine.UI;
 
 namespace CT.UIKit
 {
-    public class OcclussionModel
+    public class OcclussionModel : IOcclussionModel
     {
-        private UITableView tableView;
+        private UITableView _tableView;
         private ScrollRect _scrollRect;
 
-        private Transform srTransform;
+        private RectTransform _srRTransform;
         private bool isInit;
         private bool _isVertical, _isHorizontal;
         private float _disableMarginX, _disableMarginY;
@@ -20,71 +20,69 @@ namespace CT.UIKit
 
         private bool[] cellStates;
 
-        public OcclussionModel(UITableView _tableView)
+        public bool IsSubscribed { get; private set; }
+
+        public OcclussionModel()
         {
-            tableView = _tableView;
-            _scrollRect = _tableView.ScrollRect;
+
         }
 
-        public void Subscribe(UITableView _tableView)
+        public void Init(UITableView _tableView)
         {
-            isInit = false;
-            tableView = _tableView;
-            _scrollRect = _tableView.ScrollRect;
-            _scrollRect.onValueChanged.AddListener(UpdateCellsState);
+            this._tableView = _tableView;
 
-            ITableViewContentDataSource dataSource = tableView.m_dataSource;
-            cellStates = new bool[dataSource.GetNumberOfRows(tableView)];
+            isInit = false;
+
+            _scrollRect = _tableView.ScrollRect;
+            _srRTransform = _scrollRect.GetComponent<RectTransform>();
+            _isVertical = _scrollRect.vertical;
+            _isHorizontal = _scrollRect.horizontal;
+        }
+
+        public void Subscribe()
+        {
+            _scrollRect.onValueChanged.AddListener(Check);
+            IsSubscribed = true;
         }
 
         public void Unsubscribe()
         {
             if (_scrollRect != null)
-                _scrollRect.onValueChanged.RemoveListener(UpdateCellsState);
+                _scrollRect.onValueChanged.RemoveListener(Check);
+            IsSubscribed = false;
         }
 
-        public void UpdateModel()
+        public void UpdateValues()
         {
-            SetEnabledState(true);
-        }
+            if (!isInit)
+                isInit = true;
 
-        public void ForceRebuildLayout()
-        {
-            _isVertical = _scrollRect.vertical;
-            _isHorizontal = _scrollRect.horizontal;
-        }
+            ITableViewContentDataSource dataSource = _tableView.m_dataSource;
+            Debug.Log($"Count {dataSource.GetNumberOfRows(_tableView)}");
+            cellStates = new bool[dataSource.GetNumberOfRows(_tableView)];
 
-        public void Init()
-        {
-            srTransform = _scrollRect.transform;
-
-            if (_scrollRect.TryGetComponent(out RectTransform rectTransform))
+            if (_srRTransform)
             {
-                Rect rect = rectTransform.rect;
-                Vector2 sizeDelta = tableView.Cells[0].Rect.sizeDelta;
+                Rect rect = _srRTransform.rect;
+                Vector2 sizeDelta = _tableView.LayoutGroup.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta;
                 _disableMarginX = rect.width / 2 + sizeDelta.x;
                 _disableMarginY = rect.height / 2 + sizeDelta.y;
             }
-
-            SetEnabledState(false);
-
-            isInit = true;
-            UpdateCellsState(_scrollRect.normalizedPosition);
         }
 
-        private void SetEnabledState(bool isEnabled)
+        public void SetEnabledLayoutGroupState(bool isEnabled)
         {
-            tableView.LayoutGroup.enabled = isEnabled;
-            if (tableView.LayoutGroup.TryGetComponent(out ContentSizeFitter fitter))
+            _tableView.LayoutGroup.enabled = isEnabled;
+            if (_tableView.LayoutGroup.TryGetComponent(out ContentSizeFitter fitter))
                 fitter.enabled = isEnabled;
         }
 
-        private void UpdateCellsState(Vector2 value = default)
+        public void Check(Vector2 value = default)
         {
             if (!isInit)
                 return;
 
-            foreach (UITableViewCell cell in tableView.Cells)
+            foreach (UITableViewCell cell in _tableView.Cells)
                 UpdateCellState(cell);
         }
 
@@ -92,7 +90,7 @@ namespace CT.UIKit
         {
             RectTransform rect = cell.Rect;
 
-            Vector3 inverseTrPoint = srTransform.InverseTransformPoint(rect.position);
+            Vector3 inverseTrPoint = _srRTransform.InverseTransformPoint(rect.position);
             bool isLessVertical = inverseTrPoint.y < -_disableMarginY - Offset.y;
             bool isGreatVertical = inverseTrPoint.y > _disableMarginY + Offset.y;
 
@@ -129,7 +127,18 @@ namespace CT.UIKit
             cellGO.SetActive(isActive);
             if (!isDisplay)
                 return;
-            tableView.OnWillDisplay(tableView, cell, indexPath);
+            _tableView.OnWillDisplay(_tableView, cell, indexPath);
         }
+    }
+
+    public interface IOcclussionModel
+    {
+        bool IsSubscribed { get; }
+        void Init(UITableView _tableView);
+        void Subscribe();
+        void Unsubscribe();
+        void UpdateValues();
+        void Check(Vector2 value = default);
+        void SetEnabledLayoutGroupState(bool isEnabled);
     }
 }

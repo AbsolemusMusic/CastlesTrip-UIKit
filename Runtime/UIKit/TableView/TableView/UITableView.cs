@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,8 +16,6 @@ namespace CT.UIKit
         private LayoutGroup layoutGroup;
         public LayoutGroup LayoutGroup => layoutGroup;
 
-        private OcclussionModel occlussionModel;
-
         public ITableViewDataSource m_dataSource;
         public ITableViewDelegate m_delegate;
 
@@ -23,6 +23,12 @@ namespace CT.UIKit
         public UITableViewCell CellSelected => lastSelected ? lastSelected : null;
         private List<UITableViewCell> cells = new List<UITableViewCell>();
         public List<UITableViewCell> Cells => cells;
+
+        public Action<UITableView> OnReloadSuccess;
+
+        private IOcclussionModel occlussionModel = new OcclussionModel();
+
+        private IEnumerator reloader;
 
 
         public int CellSelectedID
@@ -35,6 +41,10 @@ namespace CT.UIKit
             }
         }
 
+        public UITableView()
+        {
+            reloader = ReloadAsync();
+        }
 
         public UITableViewCell GetCell(IndexPath indexPath)
         {
@@ -65,19 +75,38 @@ namespace CT.UIKit
 
         public virtual void Reload()
         {
-            occlussionModel?.Unsubscribe();
-            if (m_dataSource.GetOcclussionState(this))
+            if (reloader != null)
+                Coroutines.StopRoutine(reloader);
+
+            Coroutines.StartRoutine(reloader);
+        }
+
+        public virtual IEnumerator ReloadAsync()
+        {
+            bool isOcclussion = m_dataSource.GetOcclussionState(this);
+            if (isOcclussion)
             {
-                if (occlussionModel == null)
-                    occlussionModel = new OcclussionModel(this);
-                occlussionModel?.Subscribe(this);
+                if (occlussionModel.IsSubscribed)
+                    occlussionModel.Unsubscribe();
+
+                occlussionModel?.Init(this);
+                occlussionModel?.Subscribe();
+                occlussionModel?.SetEnabledLayoutGroupState(true);
             }
 
             RemoveItems();
             Fetch();
             ForceRebuildLayout();
 
-            occlussionModel?.UpdateModel();
+            LayoutRebuilder.MarkLayoutForRebuild(LayoutGroup.GetComponent<RectTransform>());
+            yield return new WaitForEndOfFrame();
+            if (isOcclussion)
+            {
+                occlussionModel?.UpdateValues();
+                occlussionModel?.SetEnabledLayoutGroupState(false);
+                occlussionModel?.Check();
+            }
+            OnReloadSuccess?.Invoke(this);
         }
 
         public virtual void Fetch()
@@ -193,18 +222,6 @@ namespace CT.UIKit
         public virtual void ForceRebuildLayout(RectTransform parentRT)
         {
             LayoutRebuilder.ForceRebuildLayoutImmediate(parentRT);
-            occlussionModel?.ForceRebuildLayout();
-
-            if (occlussionModel == null)
-                return;
-            // TODO: Временное решение
-            Invoke(nameof(TryInitOcculussion), occlussionModel.WAIT);
-        }
-
-        // TODO: Временное решение
-        private void TryInitOcculussion()
-        {
-            occlussionModel?.Init();
         }
     }
 }
