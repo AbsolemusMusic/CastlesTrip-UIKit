@@ -229,7 +229,7 @@ namespace CT.UIKit
             // Эта функция вызывается, когда изменился прямой или косвенный родитель преобразования GameObject.
             Debug.Log($"Call : {nameof(OnTransformParentChanged)}");
             occlussionModel?.SetEnabledState(false);
-
+            occlussionModel?.Init();
         }
 
         private void OnCanvasGroupChanged()
