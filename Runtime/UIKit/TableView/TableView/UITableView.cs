@@ -41,11 +41,6 @@ namespace CT.UIKit
             }
         }
 
-        public UITableView()
-        {
-            reloader = ReloadAsync();
-        }
-
         public UITableViewCell GetCell(IndexPath indexPath)
         {
             foreach (GameObject cellGO in layoutGroup.transform)
@@ -76,8 +71,12 @@ namespace CT.UIKit
         public virtual void Reload()
         {
             if (reloader != null)
+            {
                 Coroutines.StopRoutine(reloader);
+                reloader = null;
+            }
 
+            reloader = ReloadAsync();
             Coroutines.StartRoutine(reloader);
         }
 
