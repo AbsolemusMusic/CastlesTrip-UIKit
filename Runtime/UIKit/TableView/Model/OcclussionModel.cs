@@ -43,10 +43,10 @@ namespace CT.UIKit
                 _scrollRect.onValueChanged.RemoveListener(UpdateCellsState);
         }
 
-        //public void UpdateModel()
-        //{
-        //    SetEnabledState(true);
-        //}
+        public void UpdateModel()
+        {
+            SetEnabledState(true);
+        }
 
         public void ForceRebuildLayout()
         {
@@ -66,13 +66,13 @@ namespace CT.UIKit
                 _disableMarginY = rect.height / 2 + sizeDelta.y;
             }
 
-            //SetEnabledState(false);
+            SetEnabledState(false);
 
             isInit = true;
             UpdateCellsState(_scrollRect.normalizedPosition);
         }
 
-        public void SetEnabledState(bool isEnabled)
+        private void SetEnabledState(bool isEnabled)
         {
             tableView.LayoutGroup.enabled = isEnabled;
             if (tableView.LayoutGroup.TryGetComponent(out ContentSizeFitter fitter))

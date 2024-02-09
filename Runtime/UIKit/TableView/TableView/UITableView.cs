@@ -65,12 +65,19 @@ namespace CT.UIKit
 
         public virtual void Reload()
         {
-            UpdateOcclussionModel();
+            occlussionModel?.Unsubscribe();
+            if (m_dataSource.GetOcclussionState(this))
+            {
+                if (occlussionModel == null)
+                    occlussionModel = new OcclussionModel(this);
+                occlussionModel?.Subscribe(this);
+            }
+
             RemoveItems();
             Fetch();
-            //ForceRebuildLayout();
+            ForceRebuildLayout();
 
-            //occlussionModel?.UpdateModel();
+            occlussionModel?.UpdateModel();
         }
 
         public virtual void Fetch()
@@ -179,62 +186,25 @@ namespace CT.UIKit
 
         public virtual void ForceRebuildLayout()
         {
-            //if (layoutGroup.transform.parent.TryGetComponent(out RectTransform rectTr))
-            //    ForceRebuildLayout(rectTr);
+            if (layoutGroup.transform.parent.TryGetComponent(out RectTransform rectTr))
+                ForceRebuildLayout(rectTr);
         }
 
         public virtual void ForceRebuildLayout(RectTransform parentRT)
         {
-            //LayoutRebuilder.ForceRebuildLayoutImmediate(parentRT);
-            //occlussionModel?.ForceRebuildLayout();
-
-            //if (occlussionModel == null)
-            //    return;
-            //// TODO: Временное решение
-            //Invoke(nameof(TryInitOcculussion), occlussionModel.WAIT);
-        }
-
-        private void UpdateOcclussionModel()
-        {
-            occlussionModel?.Unsubscribe();
-            if (!m_dataSource.GetOcclussionState(this))
-                return;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(parentRT);
+            occlussionModel?.ForceRebuildLayout();
 
             if (occlussionModel == null)
-                occlussionModel = new OcclussionModel(this);
-            occlussionModel?.Subscribe(this);
+                return;
+            // TODO: Временное решение
+            Invoke(nameof(TryInitOcculussion), occlussionModel.WAIT);
         }
 
         // TODO: Временное решение
         private void TryInitOcculussion()
         {
             occlussionModel?.Init();
-        }
-
-        private void OnTransformChildrenChanged()
-        {
-            // Эта функция вызывается, когда список детей преобразования GameObject изменился.
-            Debug.Log($"Call : {nameof(OnTransformChildrenChanged)}");
-        }
-
-        private void OnBeforeTransformParentChanged()
-        {
-            // Эта функция вызывается, перед изменением прямого или косвенного родителя преобразования GameObject.
-            Debug.Log($"Call : {nameof(OnBeforeTransformParentChanged)}");
-            occlussionModel?.SetEnabledState(true);
-        }
-
-        private void OnTransformParentChanged()
-        {
-            // Эта функция вызывается, когда изменился прямой или косвенный родитель преобразования GameObject.
-            Debug.Log($"Call : {nameof(OnTransformParentChanged)}");
-            occlussionModel?.SetEnabledState(false);
-            occlussionModel?.Init();
-        }
-
-        private void OnCanvasGroupChanged()
-        {
-            Debug.Log($"Call : {nameof(OnCanvasGroupChanged)}");
         }
     }
 }
