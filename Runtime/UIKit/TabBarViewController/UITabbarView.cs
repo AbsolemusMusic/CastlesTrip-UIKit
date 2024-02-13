@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace CT.UIKit
 {
-    public class TabbarView : MonoBehaviour, ITabbarView
+    public class UITabbarView : MonoBehaviour, IUITabbarView
     {
         [SerializeField]
-        private List<TabbarButton> buttons;
+        private List<UITabbarButton> buttons;
 
         private int selectedID = 0;
         public int SelectedID => selectedID;
@@ -18,20 +18,20 @@ namespace CT.UIKit
 
         public virtual void Start()
         {
-            foreach (TabbarButton tabbar in buttons)
+            foreach (UITabbarButton tabbar in buttons)
             {
-                tabbar.OnClicked += Tabbar_OnClicked;
+                tabbar.OnClicked += OnTabbarTapped;
             }
         }
 
         public virtual void Select(int index)
         {
-            Tabbar_OnClicked(buttons[index]);
+            OnTabbarTapped(buttons[index]);
         }
 
-        public virtual void Tabbar_OnClicked(TabbarButton obj)
+        public virtual void OnTabbarTapped(UITabbarButton obj)
         {
-            foreach (TabbarButton tabbar in buttons)
+            foreach (UITabbarButton tabbar in buttons)
             {
                 int id = buttons.IndexOf(tabbar);
                 bool state = obj.Equals(tabbar);

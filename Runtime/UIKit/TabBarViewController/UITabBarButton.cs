@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace CT.UIKit
 {
     [Serializable]
-    public class TabbarButton : MonoBehaviour, ITabbarButton
+    public class UITabbarButton : MonoBehaviour, IUITabbarButton
     {
         [SerializeField]
         private Button mainButton;
@@ -19,7 +19,7 @@ namespace CT.UIKit
         [SerializeField]
         private Sprite inactiveSprite;
 
-        public event Action<TabbarButton> OnClicked;
+        public event Action<UITabbarButton> OnClicked;
 
         private void Start()
         {

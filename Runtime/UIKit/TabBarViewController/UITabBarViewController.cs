@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace CT.UIKit
 {
-    public abstract class TabbarViewController : UIViewController, ITabbarViewController
+    public abstract class UITabbarViewController : UIViewController, IUITabbarViewController
     {
-        public virtual TabbarView tabbarView { get; }
+        public virtual IUITabbarView tabbarView { get; }
 
         public abstract bool IsHorizontal { get; }
 
@@ -120,7 +120,7 @@ namespace CT.UIKit
         public virtual void OnSelected(int itemID) { }
     }
 
-    public interface ITabbarViewController
+    public interface IUITabbarViewController
     {
         abstract UIViewController GetViewControllerForTabbar(int itemID);
         abstract bool CanSelect(int itemID);
