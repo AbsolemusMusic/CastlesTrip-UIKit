@@ -4,13 +4,6 @@ using Extension.UI;
 
 namespace CT.UIKit
 {
-    public enum ViewControllerPresentType
-    {
-        none, fromUp, fromDown, fromLeft, fromRight
-    }
-
-    public delegate void CloseHandlerUIViewController(bool canClose);
-
     public class UIViewController : MonoBehaviour, IUIViewController
     {
         [SerializeField]
@@ -43,7 +36,7 @@ namespace CT.UIKit
             }
         }
 
-        public ViewControllerPresentType PresentType
+        public UIViewControllerPresentType PresentType
         {
             set
             {
@@ -152,7 +145,7 @@ namespace CT.UIKit
 
         public virtual void DidClosed()
         {
-            if (anim.PresentType == ViewControllerPresentType.none) { Destroy(gameObject); return; }
+            if (anim.PresentType == UIViewControllerPresentType.none) { Destroy(gameObject); return; }
             CompletionEH completion = delegate
             {
                 if (this == null) return;
@@ -169,14 +162,14 @@ namespace CT.UIKit
             if (isShow)
             {
                 gameObject.SetActive(true);
-                if (anim.PresentType == ViewControllerPresentType.none)
+                if (anim.PresentType == UIViewControllerPresentType.none)
                     return;
 
                 anim.PresentAnimation(true, null);
                 return;
             }
 
-            if (anim.PresentType == ViewControllerPresentType.none)
+            if (anim.PresentType == UIViewControllerPresentType.none)
             {
                 gameObject.SetActive(false);
                 return;
@@ -198,101 +191,6 @@ namespace CT.UIKit
                 return;
 
             previousVC.UpdateContent();
-        }
-    }
-
-    public interface IUIViewController
-    {
-        public abstract void OnEnable();
-        public abstract void OnDisable();
-        public abstract void Awake();
-        public abstract void Start();
-        public abstract void OnRenderSuccess();
-        public abstract void OnDestroy();
-        public abstract void OnBackTapped();
-        public abstract void UpdateContent();
-    }
-
-    public struct Anchors
-    {
-        public Vector2 min;
-        public Vector2 max;
-
-        public Anchors(Vector2 min, Vector2 max)
-        {
-            this.min = min;
-            this.max = max;
-        }
-    }
-
-    public class UIViewControllerAnimation
-    {
-        private RectTransform m_contentRT;
-        private RectTransform contentRT => m_contentRT;
-
-        private ViewControllerPresentType presentType = ViewControllerPresentType.none;
-        public ViewControllerPresentType PresentType
-        {
-            get
-            {
-                return presentType;
-            }
-
-            set
-            {
-                presentType = value;
-                target = GetStartAnchors(presentType);
-                // TODO: Разобраться нужно ли
-                //UpdatePosition();
-            }
-        }
-        public virtual float CloseWaitTime => presentType != ViewControllerPresentType.none ? 0.8f : 0f;
-
-        private Anchors target = new Anchors();
-
-        public void Init(RectTransform rect)
-        {
-            m_contentRT = rect;
-        }
-
-        public void PresentAnimation(bool isPresent, CompletionEH completion)
-        {
-            ProgressChangedEH handler = GetHandler(isPresent);
-            Animation anim = new Animation();
-            anim.AnimTime = CloseWaitTime;
-            anim.AnimType = AnimationType.Pow2AnimationType;
-            anim.StartAnim(handler, completion);
-            if (!isPresent) return;
-            UpdatePosition();
-        }
-
-        private void UpdatePosition()
-        {
-            contentRT.anchorMin = target.min;
-            contentRT.anchorMax = target.max;
-        }
-
-        private Anchors GetStartAnchors(ViewControllerPresentType presentType)
-        {
-            switch (presentType)
-            {
-                case ViewControllerPresentType.fromUp: return new Anchors(new Vector2(0f, 1f), new Vector2(1f, 2f));
-                case ViewControllerPresentType.fromRight: return new Anchors(new Vector2(1f, 0f), new Vector2(2f, 1f));
-                case ViewControllerPresentType.fromDown: return new Anchors(new Vector2(0f, -1f), new Vector2(1f, 0f));
-                case ViewControllerPresentType.fromLeft: return new Anchors(new Vector2(-1f, 0f), new Vector2(0f, 1f));
-                default: return new Anchors(Vector2.zero, Vector2.one);
-            }
-        }
-
-        private ProgressChangedEH GetHandler(bool isPresent)
-        {
-            ProgressChangedEH handler = delegate (float progress, float scale)
-            {
-                if (!contentRT) return;
-                contentRT.anchorMin = Vector2.Lerp(contentRT.anchorMin, isPresent ? Vector2.zero : target.min, scale);
-                contentRT.anchorMax = Vector2.Lerp(contentRT.anchorMax, isPresent ? Vector2.one : target.max, scale);
-            };
-            return handler;
         }
     }
 }

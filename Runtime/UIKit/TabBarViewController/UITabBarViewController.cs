@@ -17,9 +17,9 @@ namespace CT.UIKit
 
         private List<UIViewController> viewControllers = new List<UIViewController>();
 
-        private ViewControllerPresentType[] horizontal = new ViewControllerPresentType[] { ViewControllerPresentType.fromRight, ViewControllerPresentType.fromLeft };
-        private ViewControllerPresentType[] vertical = new ViewControllerPresentType[] { ViewControllerPresentType.fromDown, ViewControllerPresentType.fromUp };
-        private ViewControllerPresentType[] targetPresentTypes => IsHorizontal ? horizontal : vertical;
+        private UIViewControllerPresentType[] horizontal = new UIViewControllerPresentType[] { UIViewControllerPresentType.fromRight, UIViewControllerPresentType.fromLeft };
+        private UIViewControllerPresentType[] vertical = new UIViewControllerPresentType[] { UIViewControllerPresentType.fromDown, UIViewControllerPresentType.fromUp };
+        private UIViewControllerPresentType[] targetPresentTypes => IsHorizontal ? horizontal : vertical;
 
         public override void Present(bool isShow = true)
         {
@@ -76,7 +76,7 @@ namespace CT.UIKit
             if (!isInited)
             {
                 currentID = targetID;
-                targetVC.PresentType = ViewControllerPresentType.none;
+                targetVC.PresentType = UIViewControllerPresentType.none;
                 isInited = true;
                 targetVC.Show(true);
                 OnSelected(currentID);
@@ -91,7 +91,7 @@ namespace CT.UIKit
             OnSelected(currentID);
         }
 
-        private ViewControllerPresentType GetPresentType(bool isNext)
+        private UIViewControllerPresentType GetPresentType(bool isNext)
         {
             int id = isNext ? 0 : 1;
             return targetPresentTypes[id];
